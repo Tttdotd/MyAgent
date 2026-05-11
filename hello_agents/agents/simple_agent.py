@@ -1,6 +1,6 @@
 """简单Agent实现 - 基于OpenAI原生API"""
 
-from typing import Optional, Iterator
+from typing import Optional
 
 from ..core.agent import Agent
 from ..core.llm import HelloAgentsLLM
@@ -55,32 +55,13 @@ class SimpleAgent(Agent):
     
     def stream_run(self, input_text: str, **kwargs):
         """
-        流式运行Agent
+        以生成器形式运行Agent。
         
         Args:
             input_text: 用户输入
             **kwargs: 其他参数
             
         Yields:
-            Agent响应片段
+            Agent完整响应
         """
-        # 构建消息列表
-        messages = []
-        
-        if self.system_prompt:
-            messages.append({"role": "system", "content": self.system_prompt})
-        
-        for msg in self._history:
-            messages.append({"role": msg.role, "content": msg.content})
-        
-        messages.append({"role": "user", "content": input_text})
-        
-        # 流式调用LLM
-        full_response = ""
-        for chunk in self.llm.stream_invoke(messages, **kwargs):
-            full_response += chunk
-            yield chunk
-        
-        # 保存完整对话到历史记录
-        self.add_message(Message(input_text, "user"))
-        self.add_message(Message(full_response, "assistant"))
+        yield self.run(input_text, **kwargs)
