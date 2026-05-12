@@ -1,15 +1,15 @@
 from agent import CodingAgent
-from hello_agents import HelloAgentsLLM
+from tools import FileWriterTool
+from hello_agents import HelloAgentsLLM, ToolRegistry
 
 
-llm = HelloAgentsLLM()
 
-agent = CodingAgent(
-    name="coder",
-    llm=llm,
-)
+agent = CodingAgent()
 
-user_prompt = "你好, 介绍一下你自己."
+user_prompt = input("请输入你的编程任务: ").strip()
+if not user_prompt:
+    raise SystemExit("任务不能为空")
+
 response = agent.run(user_prompt)
 
 print(response)
