@@ -1,6 +1,6 @@
 """工具注册表 - HelloAgents原生工具系统"""
 
-from typing import Optional, Any, Callable
+from typing import Optional, Any, Callable, Dict
 from ..core.exceptions import HelloAgentsException
 from .base import Tool
 
@@ -10,8 +10,8 @@ class ToolRegistry:
 
     提供工具的注册、管理和执行功能。
     支持两种工具注册方式：
-    1. Tool对象注册（推荐）
-    2. 函数直接注册（简便）
+    1. Tool对象注册(推荐)
+    2. 函数直接注册(简便)
     """
 
     def __init__(self):
@@ -69,7 +69,7 @@ class ToolRegistry:
         func_info = self._functions.get(name)
         return func_info["func"] if func_info else None
 
-    def execute_tool(self, name: str, input_text: str) -> str:
+    def execute_tool(self, name: str, parameters: Dict[str, Any]) -> str:
         """
         执行工具
 
@@ -85,7 +85,7 @@ class ToolRegistry:
             tool = self._tools[name]
             try:
                 # 简化参数传递，直接传入字符串
-                return tool.run({"input": input_text})
+                return tool.run(parameters=parameters)
             except Exception as e:
                 return f"错误：执行工具 '{name}' 时发生异常: {str(e)}"
 
@@ -93,7 +93,7 @@ class ToolRegistry:
         elif name in self._functions:
             func = self._functions[name]["func"]
             try:
-                return func(input_text)
+                return func(**parameters)
             except Exception as e:
                 return f"错误：执行工具 '{name}' 时发生异常: {str(e)}"
 
@@ -111,7 +111,22 @@ class ToolRegistry:
 
         # Tool对象描述
         for tool in self._tools.values():
-            descriptions.append(f"- {tool.name}: {tool.description}")
+            tool_description = f"- {tool.name}: {tool.description}"
+            parameters = tool.get_parameters()
+            parameter_lines = []
+            for parameter in parameters:
+                required_text = "required" if parameter.required else "optional"
+                default_text = (
+                    f", default={parameter.default}"
+                    if parameter.default is not None
+                    else ""
+                )
+                parameter_lines.append(
+                    f"  - {parameter.name} ({parameter.type}, {required_text}{default_text}): "
+                    f"{parameter.description}"
+                )
+            tool_description += "\n  参数:\n" + "\n".join(parameter_lines)
+            descriptions.append(tool_description)
 
         # 函数工具描述
         for name, info in self._functions.items():

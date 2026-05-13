@@ -10,7 +10,13 @@ from .version import __version__, __author__, __email__, __description__
 from .core.llm import HelloAgentsLLM
 from .core.config import Config
 from .core.message import Message
-from .core.exceptions import HelloAgentsException
+from .core.exceptions import (
+    AgentException,
+    ConfigException,
+    HelloAgentsException,
+    LLMException,
+    ToolException,
+)
 
 # Agent实现
 from .agents.simple_agent import SimpleAgent
@@ -19,6 +25,7 @@ from .agents.reflection_agent import ReflectionAgent
 from .agents.plan_solve_agent import PlanAndSolveAgent
 
 # 工具系统
+from .tools.base import Tool, ToolParameter
 from .tools.registry import ToolRegistry, global_registry
 from .tools.builtin.search import SearchTool, search
 from .tools.builtin.calculator import CalculatorTool, calculate
@@ -37,6 +44,10 @@ __all__ = [
     "Config",
     "Message",
     "HelloAgentsException",
+    "LLMException",
+    "AgentException",
+    "ConfigException",
+    "ToolException",
 
     # Agent范式
     "SimpleAgent",
@@ -45,6 +56,8 @@ __all__ = [
     "PlanAndSolveAgent",
 
     # 工具系统
+    "Tool",
+    "ToolParameter",
     "ToolRegistry",
     "global_registry",
     "SearchTool",

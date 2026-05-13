@@ -19,6 +19,7 @@ class Tool(ABC):
         self.name = name
         self.description = description
     
+    # 返回值要描述好: 对{...}做了{...}, 做成功了没有
     @abstractmethod
     def run(self, parameters: Dict[str, Any]) -> str:
         """执行工具"""

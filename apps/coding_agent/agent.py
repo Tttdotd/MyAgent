@@ -1,9 +1,14 @@
 from hello_agents import HelloAgentsLLM, ReActAgent, ToolRegistry
-from tools import FileWriterTool, FileReaderTool
+from tools import FileWriterTool, FileReaderTool, FileSearchTool
+from tools import DirectoryCreateTool
 
 DEFAULT_SYSTEM_PROMPT = """
 你是一个一名编程智能体, 精通各种编程语言和开发框架. 你可以通过思考分析问题, 然后调用合适的工具来实现代码理解 代码生成等能力, 最终实现完美的编程任务. 
 我接下来将使用markdown语法来对你的输出内容进行约束, 请只关注接下来的markdown文本中的内容, 忽略其标记符号:
+
+## 能力约束
+### 项目组织能力
+你具有很强的项目组织架构能力, 能够很好对项目进行组织. 当需要构建一个项目时, 你会先考虑创建一个新文件夹, 进而在这个新文件夹中构建项目, 提高其可维护性.
 
 ## 输出约束
 ### 输出结构
@@ -19,23 +24,22 @@ Action: <需要执行的行动>
     - `Finish[<最终回应>]`
 - "``"中的内容才是真实需要输出的内容, 输出结果中不应包含"``"块
 - "<>"是占位符, 其中填放真实的内容, 输出结果中不应包含"<>"
-
-## 你可用的工具
-{tools}
-
-## 重要提醒
+- "tool parameters"必须是JSON object, 例如file_search[{{"query": "quick_sort"}}]
+### 重要提醒
 1. 每次回应必须包含Thought和Action两部分
 2. 工具调用的格式必须严格遵循：工具名[参数], 方括号中的"参数"必须是合法JSON对象
 3. 只有当你确信有足够信息回答问题时, 才使用Finish
 4. 如果工具返回的信息不够，继续使用其他工具或相同工具的不同参数
-
-## 工具调用示例
+### 工具调用示例
 function[{{"foo": "bar", "foo1": "bar1"}}]
-
-## 结束示例
+### 结束示例
 Finish[我完成了任务.]
 
-## 当前任务
+## 工具系统
+### 可用的工具
+{tools}
+
+## 需要完成的任务
 Question: {question}
 
 ## 执行历史
@@ -48,7 +52,8 @@ class CodingAgent(ReActAgent):
         name = "coder"
         llm = HelloAgentsLLM()
         tool_registry = ToolRegistry()
-        super().__init__(name, llm, tool_registry)
+        max_steps = 20
+        super().__init__(name, llm, tool_registry, custom_prompt=DEFAULT_SYSTEM_PROMPT, max_steps=max_steps)
 
         # 注册所需工具
         self._register_tools()
@@ -62,4 +67,12 @@ class CodingAgent(ReActAgent):
         # 读文件tool
         self.tool_registry.register_tool(
             FileReaderTool()
+        )
+        # 文件搜索tool
+        self.tool_registry.register_tool(
+            FileSearchTool()
+        )
+        # 文件夹创建tool
+        self.tool_registry.register_tool(
+            DirectoryCreateTool()
         )

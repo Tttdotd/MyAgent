@@ -1,6 +1,7 @@
 """ReAct Agent实现 - 推理与行动结合的智能体"""
 
 import re
+import json
 from typing import Optional, List, Dict, Any, Tuple
 from ..core.agent import Agent
 from ..core.llm import HelloAgentsLLM
@@ -9,27 +10,42 @@ from ..core.message import Message
 from ..tools.registry import ToolRegistry
 
 # 默认ReAct提示词模板
-DEFAULT_REACT_PROMPT = """你是一个具备推理和行动能力的AI助手。你可以通过思考分析问题，然后调用合适的工具来获取信息，最终给出准确的答案。
+DEFAULT_REACT_PROMPT = """
+你是一个具备推理和行动能力的AI助手. 你可以通过思考分析问题, 然后调用合适的工具来获取信息, 最终给出准确的答案. 
+我接下来将使用markdown语法来对你的输出内容进行约束, 请只关注接下来的markdown文本中的内容, 忽略其标记符号:
 
-## 可用工具
+## 输出约束
+### 输出结构
+请严格按照以下结构进行回应, 每次只能执行一个步骤:
+```
+Thought: <分析当前问题，思考需要什么信息或采取什么行动>
+Action: <需要执行的行动>
+```
+### 补充说明
+- "```"块中的内容才是需要输出的结构, 输出中不要包含"```"块
+- "Action: <action>"中的action只能是以下两种结构之一:
+    - `<tool name>[<tool parameters>]`
+    - `Finish[<最终回应>]`
+- "``"中的内容才是真实需要输出的内容, 输出结果中不应包含"``"块
+- "<>"是占位符, 其中填放真实的内容, 输出结果中不应包含"<>"
+
+## 你可用的工具
 {tools}
-
-## 工作流程
-请严格按照以下格式进行回应，每次只能执行一个步骤：
-
-**Thought:** 分析当前问题，思考需要什么信息或采取什么行动。
-**Action:** 选择一个行动，格式必须是以下之一：
-- `{{tool_name}}[{{tool_input}}]` - 调用指定工具
-- `Finish[最终答案]` - 当你有足够信息给出最终答案时
 
 ## 重要提醒
 1. 每次回应必须包含Thought和Action两部分
-2. 工具调用的格式必须严格遵循：工具名[参数]
-3. 只有当你确信有足够信息回答问题时，才使用Finish
+2. 工具调用的格式必须严格遵循：工具名[参数], 方括号中的"参数"必须是合法JSON对象
+3. 只有当你确信有足够信息回答问题时, 才使用Finish
 4. 如果工具返回的信息不够，继续使用其他工具或相同工具的不同参数
 
+## 工具调用示例
+function[{{"foo": "bar", "foo1": "bar1"}}]
+
+## 结束示例
+Finish[我完成了任务.]
+
 ## 当前任务
-**Question:** {question}
+Question: {question}
 
 ## 执行历史
 {history}
@@ -46,7 +62,7 @@ class ReActAgent(Agent):
     3. 基于观察结果进行推理
     4. 迭代执行直到得出最终答案
     
-    这是一个经典的Agent范式，特别适合需要外部信息的任务。
+    这是一个经典的Agent范式, 特别适合需要外部信息的任务。
     """
     
     def __init__(
@@ -97,13 +113,13 @@ class ReActAgent(Agent):
         
         while current_step < self.max_steps:
             current_step += 1
-            print(f"\n--- 第 {current_step} 步 ---")
+            print(f"\n--- 第 {current_step}/{self.max_steps} 步 ---")
             
             # 构建提示词
-            tools_desc = self.tool_registry.get_tools_description()
+            tools_description = self.tool_registry.get_tools_description()
             history_str = "\n".join(self.current_history)
             prompt = self.prompt_template.format(
-                tools=tools_desc,
+                tools=tools_description,
                 question=input_text,
                 history=history_str
             )
@@ -111,7 +127,7 @@ class ReActAgent(Agent):
             # 调用LLM
             messages = [{"role": "user", "content": prompt}]
             response_text = self.llm.invoke(messages, **kwargs)
-            
+
             if not response_text:
                 print("❌ 错误：LLM未能返回有效响应。")
                 break
@@ -123,7 +139,7 @@ class ReActAgent(Agent):
                 print(f"🤔 思考: {thought}")
             
             if not action:
-                print("⚠️ 警告：未能解析出有效的Action，流程终止。")
+                print("⚠️ 警告: 未能解析出有效的Action, 流程终止.")
                 break
             
             # 检查是否完成
@@ -138,15 +154,29 @@ class ReActAgent(Agent):
                 return final_answer
             
             # 执行工具调用
-            tool_name, tool_input = self._parse_action(action)
-            if not tool_name or tool_input is None:
-                self.current_history.append("Observation: 无效的Action格式，请检查。")
+            tool_name, tool_parameters_str = self._parse_action(action)
+            try:
+                tool_parameters = json.loads(tool_parameters_str)
+            except json.JSONDecodeError:
+                self.current_history.append("Observation: 工具参数不是合法JSON对象，请重新输出Action。")
                 continue
             
-            print(f"🎬 行动: {tool_name}[{tool_input}]")
+            # TODO: 可以通过后处理代码解决"tool_parameter不是Dict类型"的情况, 不过这里先报错, 让LLM重新生成
+            # 不过这样会产生不必要的token消耗
+            if not isinstance(tool_parameters, dict):
+                self.current_history.append(
+                    'Observation: 工具参数必须是JSON对象, 例如file_search[{"query": "quick_sort"}]'
+                )
+                continue
+
+            if not tool_name or tool_parameters is None:
+                self.current_history.append("Observation: 无效的Action格式, 请检查。")
+                continue
+            
+            print(f"🎬 行动: {tool_name}[{tool_parameters_str}]")
             
             # 调用工具
-            observation = self.tool_registry.execute_tool(tool_name, tool_input)
+            observation = self.tool_registry.execute_tool(tool_name, tool_parameters)
             print(f"👀 观察: {observation}")
             
             # 更新历史
