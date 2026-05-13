@@ -31,12 +31,13 @@ class FileSearchTool(Tool):
         query = str(query).strip().lower()
         try:
             for path in self.root_dir.rglob("*"):
-                # 如果时需要忽略的文件, 直接跳过
+                # 如果是需要忽略的文件, 直接跳过
                 if self._should_ignore(path):
                     continue
-                # 跳过文件夹
-                if not path.is_file():
-                    continue
+
+                # # 跳过文件夹
+                # if not path.is_file():
+                #     continue
 
                 relative_path = path.relative_to(self.root_dir)
                 relative_text = str(relative_path).replace("\\", "/")
