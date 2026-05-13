@@ -1,6 +1,6 @@
 from hello_agents import HelloAgentsLLM, ReActAgent, ToolRegistry
-from tools import FileWriterTool, FileReaderTool, FileSearchTool
-from tools import DirectoryCreateTool
+from tools import FileWriteTool, FileReadTool, FileSearchTool
+from tools import DirectoryCreateTool, DirectoryListTool
 
 DEFAULT_SYSTEM_PROMPT = """
 你是一个一名编程智能体, 精通各种编程语言和开发框架. 你可以通过思考分析问题, 然后调用合适的工具来实现代码理解 代码生成等能力, 最终实现完美的编程任务. 
@@ -39,10 +39,13 @@ Finish[我完成了任务.]
 ### 可用的工具
 {tools}
 
-## 需要完成的任务
+## 对话历史
+{conversation_history}
+
+## 本次需要完成的任务
 Question: {question}
 
-## 执行历史
+## 本次执行历史
 {history}
 
 现在开始你的编程工作."""
@@ -62,11 +65,11 @@ class CodingAgent(ReActAgent):
     def _register_tools(self):
         # 写文件tool
         self.tool_registry.register_tool(
-            FileWriterTool()
+            FileWriteTool()
         )
         # 读文件tool
         self.tool_registry.register_tool(
-            FileReaderTool()
+            FileReadTool()
         )
         # 文件搜索tool
         self.tool_registry.register_tool(
@@ -75,4 +78,8 @@ class CodingAgent(ReActAgent):
         # 文件夹创建tool
         self.tool_registry.register_tool(
             DirectoryCreateTool()
+        )
+        # 文件夹列表tool
+        self.tool_registry.register_tool(
+            DirectoryListTool()
         )

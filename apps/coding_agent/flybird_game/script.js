@@ -28,9 +28,9 @@ const bird = {
 // Pipes properties
 let pipes = [];
 const pipeGap = 150;
-const pipeDistance = 200;
+const pipeDistance = 200; // Now interpreted as pixel distance between pipes
 const pipeWidth = 60;
-let pipeTimer = 0;
+let pipeDistanceCounter = 0; // New counter for horizontal movement
 
 // Background color
 const skyColor = '#7fb3d5';
@@ -73,8 +73,7 @@ function updateBird() {
     
     // Ceiling collision
     if (bird.y < 0) {
-        bird.y = 0;
-        bird.velocity = 0;
+        gameOver();
     }
 }
 
@@ -96,14 +95,9 @@ function createPipe() {
 function updatePipes() {
     if (!gameRunning || gamePaused) return;
     
-    pipeTimer += deltaTime;
-    if (pipeTimer > pipeDistance) {
-        createPipe();
-        pipeTimer = 0;
-    }
-    
+    // Move pipes and check for new pipe generation
     pipes.forEach(pipe => {
-        pipe.x -= 2;
+        pipe.x -= 2; // Move left by 2 pixels per frame
         
         // Check if bird passed the pipe
         if (!pipe.passed && pipe.x + pipeWidth < bird.x) {
@@ -121,6 +115,15 @@ function updatePipes() {
             gameOver();
         }
     });
+    
+    // Add to distance counter
+    pipeDistanceCounter += 2; // Accumulate movement in pixels
+    
+    // Create new pipe when distance threshold reached
+    if (pipeDistanceCounter >= pipeDistance) {
+        createPipe();
+        pipeDistanceCounter = 0; // Reset counter
+    }
     
     // Remove pipes that are off-screen
     pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
@@ -149,6 +152,10 @@ function startGame() {
     // Reset history display
     historyEl.innerHTML = `历史记录: ${history.join(', ')}`;
     
+    // Initialize pipe distance counter and create first pipe
+    pipeDistanceCounter = 0; // Reset counter
+    createPipe();   // Create first pipe immediately
+    
     // Start animation loop
     lastTime = performance.now();
     animate();
@@ -160,6 +167,11 @@ function pauseGame() {
     
     gamePaused = !gamePaused;
     pauseBtn.textContent = gamePaused ? '继续游戏' : '暂停游戏';
+    
+    // If resuming, restart animation loop
+    if (!gamePaused && gameRunning) {
+        requestAnimationFrame(animate);
+    }
 }
 
 // Animation loop

@@ -18,27 +18,27 @@ class DirectoryCreateTool(Tool):
         name = parameters.get("name")
 
         if not name:
-            return f"文件夹创建失败: 文件夹名称为空, 无法在{path}路径下创建文件夹"
+            return f"DirectoryCreate失败：文件夹名称为空, 无法在{path}路径下创建文件夹"
 
         target = (self.root_dir / path / name).resolve()
         if target != self.root_dir and self.root_dir not in target.parents:
-            return f"文件夹创建失败：不允许创建工作目录以外的文件夹: {path}"
+            return f"DirectoryCreate失败：不允许创建工作目录以外的文件夹: {path}"
 
         if target.is_dir():
-            return f"文件夹创建失败: 文件夹已存在, 无需重复创建: {target}"
+            return f"DirectoryCreate失败：文件夹已存在, 无需重复创建: {target}"
 
         try:
             target.mkdir(parents=True, exist_ok=False)
-            return f"文件夹创建成功: {target}"
+            return f"DirectoryCreate成功：文件夹创建成功: {target}"
         except Exception as e:
-            return f"文件夹创建失败: {path}，原因: {e}"
+            return f"DirectoryCreate失败：文件夹创建失败: {path}，原因: {e}"
 
     def get_parameters(self) -> List[ToolParameter]:
         return [
             ToolParameter(
                 name="path",
                 type="string",
-                description="文件夹创建位置. 用于表示在哪个路径下创建文件夹.",
+                description="文件夹创建位置. 用于表示在哪个路径下创建文件夹. 请使用相对于当前工作目录的相对路径.",
                 required=True,
                 default=str(self.root_dir) # 默认创建位置为根目录"."
             ),
