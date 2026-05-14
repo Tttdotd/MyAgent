@@ -54,8 +54,8 @@ class FileWriteTool(Tool):
             ToolParameter(
                 name="overwrite",
                 type="boolean",
-                description="是否允许覆盖已存在的文件, 若为True, 可以覆盖",
+                description="是否允许覆盖已存在的文件. 当你需要将新内容写入文件时, 将该参数设置为True",
                 required=False,
-                default=True
+                default=False
             ),
         ]

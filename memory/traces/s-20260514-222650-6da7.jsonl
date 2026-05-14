@@ -1,0 +1,13 @@
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 0, "event": "run_start", "payload": {"agent": "manual-trace", "input_chars": 9}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 0, "event": "user_input", "payload": {"input": "say hello"}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 1, "event": "llm_request", "payload": {"message_count": 1, "roles": ["user"], "chars": 798}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 1, "event": "llm_response", "payload": {"content": "Thought: use echo\nAction: echo[{\"value\": \"hello\"}]", "usage": null}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 1, "event": "parsed_action", "payload": {"thought": "use echo", "action": "echo[{\"value\": \"hello\"}]", "action_input": "{\"value\": \"hello\"}"}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 1, "event": "tool_call", "payload": {"tool": "echo", "arguments": {"value": "hello"}}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 1, "event": "tool_result", "payload": {"tool": "echo", "result": {"echo": "hello"}}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "llm_request", "payload": {"message_count": 1, "roles": ["user"], "chars": 861}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "llm_response", "payload": {"content": "Thought: enough\nAction: Finish[done]", "usage": null}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "parsed_action", "payload": {"thought": "enough", "action": "Finish[done]", "action_input": "done"}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "finish", "payload": {"answer": "done"}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "run_end", "payload": {"status": "completed"}}
+{"ts": "2026-05-14T14:26:50.899773+00:00", "session_id": "s-20260514-222650-6da7", "run_id": 1, "step": 2, "event": "session_summary", "payload": {"runs": 1, "steps": 2, "tools_used": 1, "errors": 0, "total_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}}}
