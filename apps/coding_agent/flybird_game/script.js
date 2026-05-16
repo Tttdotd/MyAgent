@@ -5,6 +5,8 @@ const startBtn = document.getElementById('start-btn');
 const pauseBtn = document.getElementById('pause-btn');
 const scoreEl = document.getElementById('score');
 const historyEl = document.getElementById('history');
+const welcomeScreen = document.getElementById('welcome-screen');
+const startBtnWelcome = document.getElementById('start-btn-welcome');
 
 // Game variables
 let gameRunning = false;
@@ -156,6 +158,9 @@ function startGame() {
     pipeDistanceCounter = 0; // Reset counter
     createPipe();   // Create first pipe immediately
     
+    // Hide welcome screen
+    welcomeScreen.style.display = 'none';
+    
     // Start animation loop
     lastTime = performance.now();
     animate();
@@ -198,6 +203,7 @@ function animate(time) {
 // Event listeners
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', pauseGame);
+startBtnWelcome.addEventListener('click', startGame); // Add listener for welcome button
 
 // Keyboard controls
 document.addEventListener('keydown', (e) => {
