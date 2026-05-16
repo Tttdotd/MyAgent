@@ -6,7 +6,7 @@ from hello_agents import Tool, ToolParameter, ToolException
 class FileWriteTool(Tool):
     def __init__(self, root_dir="."):
         super().__init__(
-            name="file_writer",
+            name="file_write",
             description="字符串文件写入工具. 当你需要将一段字符串内容写入文件的时候, 请调用此工具."
         )
         self.root_dir = Path(root_dir).resolve()

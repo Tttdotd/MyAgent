@@ -9,7 +9,7 @@ class FileReadTool(Tool):
 
     def __init__(
         self,
-        name: str = "file_reader",
+        name: str = "file_read",
         description: str = "字符串文件读取工具. 当你需要读取文件内容并加以理解的时候, 请调用此工具.",
         root_dir: str = ".",
     ):

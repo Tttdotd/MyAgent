@@ -266,7 +266,14 @@ class ReActAgent(Agent):
                     tool_parameters = json.loads(tool_parameters_str)
                 except json.JSONDecodeError as exc:
                     self._trace_error(run_id, current_step, "parse_action", exc)
-                    self.current_history.append("Observation: 工具参数不是合法JSON对象，请重新输出Action。")
+                    self.current_history.append(f"Action: {action}")
+                    self.current_history.append(
+                        f"""
+                        Observation: JSON解析失败: {exc}. 此次Action格式出现问题.
+                        请修复并重新输出同一个工具调用, 不要改变任务计划.
+                        Action中的方括号必须包住一个完整的JSON object, 例如
+                        file_writer[{"paht": "xxx", "content": "xxx", "overwrite": true}]"""
+                    )
                     continue
                 except TypeError as exc:
                     run_status = "error"

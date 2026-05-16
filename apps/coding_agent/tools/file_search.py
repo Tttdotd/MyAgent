@@ -6,7 +6,14 @@ class FileSearchTool(Tool):
 
     def __init__(self, root_dir = "."):
         name = "file_search"
-        description = "文件搜索工具. 当你只知道想要操作的文件或文件夹的名称或名称中的关键词时, 可以调用此工具在当前目录进行搜索, 以获取要操作文件或文件夹的完整路径."
+        description = """
+            文件搜索工具. 当你只知道想要操作的文件或文件夹的名称或名称中的关键词时, 
+        可以调用此工具在当前目录进行搜索, 以获取要操作文件或文件夹的完整路径. 在使用
+        该工具时, 一定要明确想要进行文件搜索的起始根路径, 确定意图, 不要随意进行搜索.
+            file_search适用场景举例, 包括但不限于如下场景: 
+                1) 不知道文件的精确路径, 不知道文件在哪里; 
+                2) 目录层级较深, 可以通过file_search来递归查找
+        """
         super().__init__(name, description)
         self.root_dir = Path(root_dir).resolve()
         self.ignore_dirs = {

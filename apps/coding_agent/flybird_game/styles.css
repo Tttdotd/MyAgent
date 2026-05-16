@@ -5,50 +5,85 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 #game-container {
     position: relative;
-    width: 400px;
+    width: 380px;
     height: 600px;
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #7fb3d5;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    background-color: #2c3e50;
+    backdrop-filter: blur(5px);
 }
 
 #game-canvas {
     display: block;
+    width: 100%;
+    height: 100%;
 }
 
 #ui {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 15px;
+    left: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     color: white;
-    font-family: Arial, sans-serif;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 button {
-    padding: 10px 15px;
-    font-size: 14px;
+    padding: 12px 20px;
+    font-size: 15px;
     cursor: pointer;
-    background-color: #4CAF50;
+    background: linear-gradient(to right, #ff6b6b, #ee5a24);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(to right, #ee5a24, #ff6b6b);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #score, #history {
     font-size: 16px;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 4px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    #game-container {
+        width: 320px;
+        height: 520px;
+    }
+    button {
+        font-size: 14px;
+        padding: 10px 18px;
+    }
+    #score, #history {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
 }
