@@ -37,6 +37,23 @@ let pipeDistanceCounter = 0; // New counter for horizontal movement
 // Background color
 const skyColor = '#7fb3d5';
 
+// Sound effect simulation (optional)
+function playSound(type) {
+    const audio = new Audio();
+    switch(type) {
+        case 'jump':
+            audio.src = 'data:audio/wav;base64,UklGRigAAABXRUJQVlA4TBEAAAAvAAAAAAfQ//7/AxoAVwB9AA==';
+            break;
+        case 'score':
+            audio.src = 'data:audio/wav;base64,UklGRigAAABXRUJQVlA4TBEAAAAvAAAAAAfQ//7/AxoAVwB9AA==';
+            break;
+        default:
+            return;
+    }
+    audio.volume = 0.2;
+    audio.play().catch(e => console.log('Audio playback blocked'));
+}
+
 // Draw bird
 function drawBird() {
     ctx.fillStyle = 'yellow';
@@ -106,6 +123,9 @@ function updatePipes() {
             pipe.passed = true;
             score += 1;
             scoreEl.textContent = `得分: ${score}`;
+            scoreEl.classList.add('shake');
+            setTimeout(() => scoreEl.classList.remove('shake'), 500);
+            playSound('score');
         }
         
         // Collision detection
@@ -164,6 +184,7 @@ function startGame() {
     // Start animation loop
     lastTime = performance.now();
     animate();
+    playSound('jump');
 }
 
 // Pause game
@@ -214,6 +235,7 @@ document.addEventListener('keydown', (e) => {
                 pauseGame();
             } else {
                 bird.velocity = bird.jumpStrength;
+                playSound('jump');
             }
         } else {
             startGame();
@@ -228,6 +250,7 @@ canvas.addEventListener('touchstart', () => {
             pauseGame();
         } else {
             bird.velocity = bird.jumpStrength;
+            playSound('jump');
         }
     } else {
         startGame();
